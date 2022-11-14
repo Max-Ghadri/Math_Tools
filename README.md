@@ -1,4 +1,4 @@
 # Math-tools
-This code calculate taylor expansion for any desired function0
+This code calculate taylor expansion for any desired function
 
-This code calculate taylor expansion for any desired function0
+The taylor expansion calculator programmed with python. To use it just define the inputs (e.g. your function etc.) 

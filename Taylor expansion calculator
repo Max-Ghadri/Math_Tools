@@ -1,0 +1,78 @@
+##### Libraries ################################################################
+import numpy as np
+from sympy import *
+import math as m
+import matplotlib.pyplot as plt
+
+##### Function #################################################################
+x = symbols('x')
+
+prime_func = (1 + x)**0.5
+
+def taylor_series_compute_and_plot(
+    development_point: float = 0, # Evaluate about which point
+    grade: int  = 8             , # degree of the taylor series
+    prime_func  = prime_func    , # Primative function
+    plot_range:  int  = 4       , # Plot range
+    draw_x_axis: bool = True
+):
+    """
+    Description:
+        The function computes the nth Taylor series for a given function 
+        and plots it with "matplotlib."
+    Parameters:
+        development_point : Evaluate about which point
+        grade             : Degree of the taylor series
+        prime_func        : Primative function
+        plot_range        : Plot range
+    return:
+        Nothing
+    """
+    # Calculating ranges for plotting
+    plot_min_x, plot_max_x = development_point - plot_range, development_point + plot_range
+    plot_points = 1000
+
+    # Calculating the nth taylor series for the primative function
+    base_taylor_expr = Float(lambdify(x, prime_func)(development_point))
+    current_function = prime_func
+
+    for k in range(1, grade + 1):
+        derivative_k        = Derivative(current_function, x).doit()
+        derivative_k_solved = lambdify(x, derivative_k)(development_point)
+        base_taylor_expr   += (derivative_k_solved / m.factorial(k)) * ((x - development_point) ** k)
+        current_function    = derivative_k
+
+    # Display calculated taylor expression
+    print('f(t) = ' + str(prime_func))
+    print(f'T({grade}, {development_point})(x) = ' + str(base_taylor_expr))
+
+    # Plot both expressions (primary and secondary function)
+    # and then calculating in an linear space N points and plotting the points using matplotlib
+    lam_prime_func  = lambdify(x, prime_func, modules=['numpy'])
+    lam_taylor_expr = lambdify(x, base_taylor_expr, modules=['numpy'])
+    x_vals = np.linspace(plot_min_x, plot_max_x, plot_points)
+    y_vals_prime_func, y_vals_taylor_expr = lam_prime_func(x_vals), lam_taylor_expr(x_vals)
+
+    # Creating subplot
+    fig, ax = plt.subplots()
+    # Ploting graphs
+    ax.plot(x_vals, y_vals_prime_func, label='prime_func')
+    ax.plot(x_vals, y_vals_taylor_expr, label=f'T({grade}, {development_point})(x)')
+    # Styling (x and y axis, etc.)
+    ax.grid(True, which='both')
+    if plot_min_x < 0 < plot_max_x:
+        ax.axvline(x=0, color='k')
+    if draw_x_axis:
+        ax.axhline(y=0, color='k')
+    # Seting labels, enabling legend, and finally show
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.legend()
+    plt.show()
+
+    # Saving in a png file
+    fig.savefig('plot.png')
+
+##### Clacualtions #############################################################
+if __name__ == '__main__':
+    taylor_series_compute_and_plot()
